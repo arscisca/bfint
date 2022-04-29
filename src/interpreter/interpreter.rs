@@ -1,6 +1,6 @@
 use std::error::Error;
 use std::fs::File;
-use std::io::Read;
+use std::io::{Read, Write};
 use crate::interpreter::interpreter::InterpreterStatus::{Done, Running};
 use super::program::{ Program, Instruction };
 
@@ -38,6 +38,19 @@ impl Interpreter {
         Interpreter::new(File::open(fname)?)
     }
 
+    pub fn dump_program<W: Write>(&self, sink: &mut W) {
+        self.program.dump(sink);
+    }
+
+    pub fn read_byte<R: Read>(source: &mut R, ignore_newlines: bool) -> Result<u8, std::io::Error> {
+        let mut buffer = [0u8];
+        source.read(&mut buffer)?;
+        while ignore_newlines && buffer[0] == '\n' as u8 {
+            source.read(&mut buffer)?;
+        }
+        Ok(buffer[0])
+    }
+
     pub fn step(&mut self) {
         let instruction = self.program.instruction(self.env.pc);
         self.env.pc += 1;
@@ -47,7 +60,7 @@ impl Interpreter {
             Instruction::IncData => self.env.memory[self.env.mp] += 1,
             Instruction::DecData => self.env.memory[self.env.mp] -= 1,
             Instruction::Output => print!("{}", self.env.memory[self.env.mp] as char),
-            Instruction::Input => todo!(),
+            Instruction::Input => self.env.memory[self.env.mp] = Interpreter::read_byte(&mut std::io::stdin(), true).expect("Could not read input"),
             Instruction::JNZ(addr) => {
                 if self.env.memory[self.env.mp] != 0 {
                     self.env.pc = addr;
