@@ -1,4 +1,5 @@
 mod interpreter;
+mod parse;
 
 extern crate argparse;
 
@@ -29,7 +30,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         // CL mode
         todo!("Command line mode is not supported yet");
     } else {
-        let mut interpreter = Interpreter::interpret_file(&fname)?.with_memory(memsize);
+        let mut interpreter = Interpreter::new();
+        interpreter.load_file(&fname)?;
         interpreter.run()?;
     }
     Ok(())

@@ -1,3 +1,2 @@
 pub mod interpreter;
-mod program;
-mod token;
+pub mod virtualmachine;

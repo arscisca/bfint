@@ -23,6 +23,12 @@ pub enum Instruction {
 
 /* Program ************************************************************************************************************/
 impl Program {
+    pub fn new() -> Program {
+        Program {
+            instructions: Vec::new(),
+        }
+    }
+
     pub fn compile<R: Read>(source: R) -> Result<Program, Box<dyn Error>> {
         let mut instructions = Vec::new();
         let mut open_bracket_stack = Vec::new();
