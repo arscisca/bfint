@@ -72,11 +72,15 @@ mod test {
     #[test]
     fn run_hello_world() {
         let sink = Vec::new();
-        Interpreter::interpret_file("test/helloworld.bf")
-            .expect("Could not open file")
-            .with_memory(128)
-            .with_output_sink(Box::new(sink))
-            .run()
+        let settings = virtualmachine::Settings {
+            memory_size: 128,
+            memory_overflow_behavior: virtualmachine::MemoryOverflowBehavior::Unchecked,
+            input: Box::new(std::io::stdin()),
+            output: Box::new(sink),
+        };
+        let mut interpreter = Interpreter::new();
+        interpreter.load_file("test/helloworld.bf");
+        interpreter.run()
             .expect("Error while running");
     }
 }
